@@ -1,0 +1,41 @@
+---
+# tasks file for sickbeard
+
+- name: Install Requirements
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - python-cheetah
+    - git
+    - python-setproctitle
+
+- name: Make sure SickRage directory has correct ownership
+  file: path={{ sickbeard_path }} state=directory owner={{ htpc_user_username }} group={{ htpc_user_group }} recurse=yes
+
+- name: Get SickRage Code from GitHub
+  git: repo={{ sickbeard_repo }} dest={{ sickbeard_path }} version={{ sickbeard_branch }} update=no
+  become: yes
+  become_user: "{{ htpc_user_username }}"
+
+- name: Update SickRage Upstart script
+  template: src=etc_init_sickrage.conf.j2 dest=/etc/init/sickrage.conf owner=root group=root
+
+- name: Update SickBeard Daemon Configuration
+  template: src=etc_default_sickrage.j2 dest=/etc/default/sickrage owner=root group=root mode=0644
+
+# SickBeard Config cannot be updated when the service is running - active running config is saved on stop.
+# SickBeard should be stopped first and config reapplied following by sickbeard start.
+
+# - name: Update Sickbeard config.ini
+#   template: src=config.ini.j2 dest={{ sickbeard_path }}/config.ini owner={{ htpc_user_username }} group={{ htpc_user_group }}
+#   register: sickbeard_updated
+
+- name: Stop Sickbeard before update
+  service: name=sickrage state=stopped
+  # when: sickbeard_updated.changed
+
+- name: Update Sickbeard config.ini
+  template: src=config.ini.j2 dest={{ sickbeard_path }}/config.ini owner={{ htpc_user_username }} group={{ htpc_user_group }}
+  # when: sickbeard_updated.changed
+
+- name: Enable and Start SickBeard
+  service: name=sickrage state=started enabled=yes
