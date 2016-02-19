@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Gregory Shulov
-  description: 
+  description: Install and Configure SickRage
   license: BSD
   min_ansible_version: 2.0
   platforms:
