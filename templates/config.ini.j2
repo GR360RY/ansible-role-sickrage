@@ -68,7 +68,7 @@ randomize_providers = 0
 check_propers_interval = daily
 allow_high_priority = 1
 skip_removed_files = 0
-allowed_extensions = "srt,nfo,srr,sfv"
+allowed_extensions = "idx,sub,srt"
 quality_default = 164
 status_default = 5
 status_default_after = 3
@@ -77,7 +77,7 @@ indexer_default = 0
 indexer_timeout = 20
 anime_default = 0
 scene_default = 0
-{% if sabnzbd_exnabled is defined and sabnzbd_enabled %}
+{% if sabnzbd_enabled is defined and sabnzbd_enabled and usenet_crawler_api_key is defined %}
 provider_order = usenet_crawler extratorrent kickasstorrents thepiratebay hounddawgs hdbits abnormal alpharatio scenetime btn rarbg hdspace torrentbytes torrentz elitetorrent speedcd tntvillage xthor shazbat_tv torrentproject phxbit bitsnoop iptorrents morethantv tvchaosuk nyaatorrents danishbits pretome torrentday btdigg cpasbien sceneaccess bitsoup newpct tokyotoshokan hdtorrents bluetigers bitcannon freshontv hd4free t411 torrentleech transmitthenet limetorrents gftracker
 {% else %}
 provider_order = extratorrent kickasstorrents thepiratebay hounddawgs hdbits abnormal alpharatio scenetime btn rarbg hdspace torrentbytes torrentz elitetorrent speedcd tntvillage xthor shazbat_tv torrentproject phxbit bitsnoop iptorrents morethantv tvchaosuk nyaatorrents danishbits pretome torrentday btdigg cpasbien sceneaccess bitsoup newpct tokyotoshokan hdtorrents bluetigers bitcannon freshontv hd4free t411 torrentleech transmitthenet limetorrents gftracker
@@ -115,14 +115,14 @@ metadata_mede8er = 0|0|0|0|0|0|0|0|0|0
 backlog_days = 7
 cache_dir = cache
 root_dirs =  0|{{ htpc_media_path }}/{{ htpc_media_tv }}
-keep_processed_dir = 1
+keep_processed_dir = 0
 process_method = copy
 del_rar_contents = 0
-move_associated_files = 0
+move_associated_files = 1
 sync_files = "!sync,lftp-pget-status,part,bts,!qb"
 postpone_if_sync_files = 1
 postpone_if_no_subs = 0
-nfo_rename = 1
+nfo_rename = 0
 process_automatically = 0
 no_delete = 0
 unpack = 0
@@ -645,7 +645,7 @@ womble_s_index_search_fallback = 0
 womble_s_index_enable_daily = 1
 womble_s_index_enable_backlog = 0
 [USENET_CRAWLER]
-{% if sabnzbd_enabled is defined and sabnzbd_enabled %}
+{% if sabnzbd_enabled is defined and sabnzbd_enabled and usenet_crawler_api_key is defined %}
 usenet_crawler = 1
 {% else %}
 usenet_crawler = 0
@@ -665,7 +665,11 @@ newzbin_password = ""
 [SABnzbd]
 sab_username = ""
 sab_password = ""
+{% if sabnzbd_enabled is defined and sabnzbd_enabled %}
+sab_apikey = {{ sab_apikey }}
+{% else %}
 sab_apikey = ""
+{% endif %}
 sab_category = tv
 sab_category_backlog = tv
 sab_category_anime = anime
@@ -693,7 +697,7 @@ nzbget_priority = 100
 torrent_username = localclient
 torrent_password = {{ deluged_localclient_password }}
 torrent_host = scgi://localhost:{{ deluged_port }}/
-{% elif deluge_enabled is defined and deluge_enabled and deluged_host == ansible_default_ipv4.address %}
+{% elif deluge_enabled is defined and deluge_enabled and deluged_host != ansible_default_ipv4.address %}
 torrent_username = localclient
 torrent_password = {{ deluged_localclient_password }}
 torrent_host = scgi://{{ deluged_host }}:{{ deluged_port }}/
@@ -887,7 +891,11 @@ email_password = ""
 email_from = ""
 email_list = ""
 [Newznab]
-newznab_data = "NZBGeek|https://api.nzbgeek.info/||5030,5040|0|eponly|0|1|1!!!Usenet-Crawler|https://www.usenet-crawler.com/||5030,5040|0|eponly|0|1|1"
+{% if usenet_crawler_api_key is defined %}
+newznab_data = "NZBGeek|https://api.nzbgeek.info/||5030,5040|0|eponly|0|1|1!!!Usenet-Crawler|https://www.usenet-crawler.com/|{{ usenet_crawler_api_key }}||1|eponly|0|1|1!!!NZB.Cat|https://nzb.cat/||5030,5040,5010|0|eponly|0|1|1!!!NZBs.org|https://nzbs.org/||5030,5040|0|eponly|0|1|1!!!DOGnzb|https://api.dognzb.cr/||5030,5040,5060,5070|0|eponly|0|1|1"
+{% else %}
+newznab_data = "NZBGeek|https://api.nzbgeek.info/||5030,5040|0|eponly|0|1|1!!!Usenet-Crawler|https://www.usenet-crawler.com/|||0|eponly|0|1|1!!!NZB.Cat|https://nzb.cat/||5030,5040,5010|0|eponly|0|1|1!!!NZBs.org|https://nzbs.org/||5030,5040|0|eponly|0|1|1!!!DOGnzb|https://api.dognzb.cr/||5030,5040,5060,5070|0|eponly|0|1|1"
+{% endif %}
 [TorrentRss]
 torrentrss_data = ""
 [GUI]
@@ -930,8 +938,8 @@ legendastv_password = ""
 opensubtitles_username = ""
 opensubtitles_password = ""
 [FailedDownloads]
-use_failed_downloads = 0
-delete_failed = 0
+use_failed_downloads = 1
+delete_failed = 1
 [ANIDB]
 use_anidb = 0
 anidb_username = ""
