@@ -1,66 +1,101 @@
 sickrage
 ========
 
-
+An Ansible role to setup and configure Sickrage PVR for usenet and torrents on Ubuntu.
 
 Requirements
 ------------
 
-This role requires Ansible 1.6 or higher. Platform requirements are listed in the metadata file.
+This role requires Ansible 2.0 or higher. Platform requirements are listed in the metadata file.
+Make sure to download roles specified in **Dependencies** section if role installed **not** with Ansible Galaxy.
+
+Overview
+--------
+
+List of tasks that will be performed under `sickrage` role:
+
+1. Install and Configure Sickrage
+2. Add integration with Sabnzbd and Deluge Download Clients
+3. Configure Kodi Notifications
 
 Role Variables
 --------------
 
-List of variables that can be passed to the role with default variable values.
+```
+---
+# defaults file for sickbeard
 
+# Helper vaiable. In use by other roles
+sickbeard_enabled: yes
 
+sickbeard_path: /opt/sickrage
+
+sickbeard_repo: https://github.com/SickRage/SickRage.git
+sickbeard_branch: master
+
+sickbeard_api_key: 9d9af7ab6548948fcdc2db864ecd2588
+
+# Helper vaiable. In use by other roles
+sickbeard_host: "{{ ansible_default_ipv4.address }}"
+```
 
 Dependencies
 ------------
 
-This role is a part of `htpc-ansible` playbook that includes additional set of components required for HTPC automation.
+* `GR360RY.htpc-common` role. Creates htpc user and media folders
 
-The following list of roles can be used together with kodi-client role:
-    
-     - kodi-client
-     - kodi-mysql
-     - sickbeard
-     - couchpotato
-     - subnzbd
-     - deluge
-     - htpc-manage
+```
+# defaults file for htpc-common
 
-Detailed info can be found following this link:
-
-https://github.com/GR360RY/htpc-ansible
-
+htpc_user_username: htpc
+htpc_user_password: htpc
+htpc_user_group: htpc
+htpc_user_shell: /bin/bash
+htpc_user_sudo_access: yes
+htpc_ssh_service: yes
+htpc_create_media_folders: yes
+htpc_zeroconf: yes
+htpc_media_path: /mnt/media
+htpc_media_movies: movies
+htpc_media_tv: tv
+htpc_media_music: music
+htpc_media_pictures: pictures
+htpc_downloads_complete: "{{ htpc_media_path }}/downloads/complete"
+htpc_downloads_incomplete: "{{ htpc_media_path }}/downloads/incomplete"
+```
 
 Example Playbook
 -------------------------
 
+```
+---
+- hosts: htpc-server
+  become: yes
+
+  roles:
+    - role: GR360RY.sickrage
+```
 
 HTPC-Ansible Project
 --------------------
 
 This role is part of HTPC-Ansible project that includes additional roles for building Ubuntu Based HTPC Server.
 
- Role name               | Comment
--------------------------|-----------------------------
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.htpc--common-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/htpc-common)   | Create htpc user and media folders
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.htpc--nas-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/htpc-nas)         | Configure NAS ( NFS, CIFS and AFP )
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.kodi--client-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/kodi-client)   | Install Kodi Media Player
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.kodi--mysql-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/kodi-mysql)     | Install MySQL Backend for Kodi
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.deluge-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/deluge)              | Install Deluge Bittornet Client
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.nzbtomedia-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/nzbtomedia)      | Install NZBtoMedia Postprocessing
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.sickrage-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/sickrage)          | Install SickRage
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.couchpotato-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/couchpotato)    | Install CouchPotato
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.htpc--manager-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/htpc-manager) | Install htpc-manager
-<!-- 
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.sabnzbd-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/sabnzbd)            | Install Sabnzbd
-[![Galaxy](http://img.shields.io/badge/galaxy-GR360RY.tvheadend-blue.svg?style=flat-square)](https://galaxy.ansible.com/GR360RY/tvheadend)        | Install Tvheadend
+Complete list of Ansible Galaxy roles is below:
+
+- [`GR360RY.htpc-common`](https://galaxy.ansible.com/GR360RY/htpc-common) - Create htpc user and media folders
+- [`GR360RY.htpc-nas`](https://galaxy.ansible.com/GR360RY/htpc-nas) - Configure NAS ( NFS, CIFS and AFP )
+- [`GR360RY.kodi-client`](https://galaxy.ansible.com/GR360RY/kodi-client) - Install Kodi Media Player
+- [`GR360RY.kodi-mysql`](https://galaxy.ansible.com/GR360RY/kodi-mysql) - Install MySQL Backend for Kodi
+- [`GR360RY.deluge`](https://galaxy.ansible.com/GR360RY/deluge) - Install Deluge Bittornet Client
+- [`GR360RY.sabnzbd`](https://galaxy.ansible.com/GR360RY/sabnzbd) - Install Sabnzbd Usenet Client
+- [`GR360RY.nzbtomedia`](https://galaxy.ansible.com/GR360RY/nzbtomedia) - Install NZBtoMedia Postprocessing
+- [`GR360RY.sickrage`](https://galaxy.ansible.com/GR360RY/sickrage) - Install SickRage
+- [`GR360RY.couchpotato`](https://galaxy.ansible.com/GR360RY/couchpotato) - Install CouchPotato
+- [`GR360RY.htpc-manager`](https://galaxy.ansible.com/GR360RY/htpc-manager) - Install HTPCManager
 
 Additional Info is available at [www.htpc-ansible.org](http://www.htpc-ansible.org)
- -->
+
 License
 -------
 
